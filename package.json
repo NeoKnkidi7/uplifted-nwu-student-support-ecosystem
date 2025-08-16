@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "build": "react-scripts build",
-    "build:android": "cd android && ./gradlew assembleRelease"
+    "build:web": "expo build:web",
+    "build:android": "expo build:android"
   }
 }
