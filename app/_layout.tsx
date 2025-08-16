@@ -12,24 +12,41 @@ SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
+// Expo Router configuration for GitHub Pages subpath
+export const unstable_settings = {
+  baseUrl: '/uplifted-nwu-student-support-ecosystem/',
+};
+
 function RootLayoutNav() {
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="profile" options={{ headerShown: false }} />
-      <Stack.Screen name="notifications" options={{ headerShown: false }} />
-      <Stack.Screen name="bursary/[id]" options={{ headerShown: false }} />
-      <Stack.Screen name="resource/[id]" options={{ headerShown: false }} />
-      <Stack.Screen name="mental-health/[id]" options={{ headerShown: false }} />
-      <Stack.Screen name="career/[id]" options={{ headerShown: false }} />
+    <Stack
+      screenOptions={{ headerShown: false }}
+      // Critical for GitHub Pages deployment:
+      basename="/uplifted-nwu-student-support-ecosystem"
+    >
+      <Stack.Screen name="(auth)" />
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="profile" />
+      <Stack.Screen name="notifications" />
+      <Stack.Screen name="bursary/[id]" />
+      <Stack.Screen name="resource/[id]" />
+      <Stack.Screen name="mental-health/[id]" />
+      <Stack.Screen name="career/[id]" />
+      <Stack.Screen name="resource-exchange" />
+      <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
     </Stack>
   );
 }
 
 export default function RootLayout() {
   useEffect(() => {
-    SplashScreen.hideAsync();
+    const hideSplash = async () => {
+      await SplashScreen.hideAsync();
+    };
+    
+    // Add timeout to ensure assets are loaded
+    const timeout = setTimeout(hideSplash, 500);
+    return () => clearTimeout(timeout);
   }, []);
 
   return (
@@ -45,18 +62,4 @@ export default function RootLayout() {
       </GestureHandlerRootView>
     </QueryClientProvider>
   );
-
-// For React Router:
-<BrowserRouter basename="/uplifted-nwu-student-support-ecosystem">
-
-// For Expo Router:
-export default function Layout() {
-  return (
-    <Stack
-      basename="/uplifted-nwu-student-support-ecosystem"
-    >
-      {/* your routes */}
-    </Stack>
-  );
-
 }
