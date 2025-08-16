@@ -1,48 +1,38 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Stack } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import React, { useEffect } from "react";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { AuthProvider } from "@/hooks/auth-store";
-import { DeadlinesProvider } from "@/hooks/deadlines-store";
-import { AIAssistantProvider } from "@/hooks/ai-assistant-store";
+import { Link, Stack } from "expo-router";
+import { StyleSheet, Text, View } from "react-native";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
-const queryClient = new QueryClient();
-
-function RootLayoutNav() {
+export default function NotFoundScreen() {
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="profile" options={{ headerShown: false }} />
-      <Stack.Screen name="notifications" options={{ headerShown: false }} />
-      <Stack.Screen name="bursary/[id]" options={{ headerShown: false }} />
-      <Stack.Screen name="resource/[id]" options={{ headerShown: false }} />
-      <Stack.Screen name="mental-health/[id]" options={{ headerShown: false }} />
-      <Stack.Screen name="career/[id]" options={{ headerShown: false }} />
-    </Stack>
+    <>
+      <Stack.Screen options={{ title: "Oops!" }} />
+      <View style={styles.container}>
+        <Text style={styles.title}>This screen doesn&apos;t exist.</Text>
+
+        <Link href="/" style={styles.link}>
+          <Text style={styles.linkText}>Go to home screen!</Text>
+        </Link>
+      </View>
+    </>
   );
 }
 
-export default function RootLayout() {
-  useEffect(() => {
-    SplashScreen.hideAsync();
-  }, []);
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <AuthProvider>
-          <DeadlinesProvider>
-            <AIAssistantProvider>
-              <RootLayoutNav />
-            </AIAssistantProvider>
-          </DeadlinesProvider>
-        </AuthProvider>
-      </GestureHandlerRootView>
-    </QueryClientProvider>
-  );
-}
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  link: {
+    marginTop: 15,
+    paddingVertical: 15,
+  },
+  linkText: {
+    fontSize: 14,
+    color: "#2e78b7",
+  },
+});
