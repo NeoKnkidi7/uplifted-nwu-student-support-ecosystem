@@ -45,4 +45,18 @@ export default function RootLayout() {
       </GestureHandlerRootView>
     </QueryClientProvider>
   );
+
+// For React Router:
+<BrowserRouter basename="/uplifted-nwu-student-support-ecosystem">
+
+// For Expo Router:
+export default function Layout() {
+  return (
+    <Stack
+      basename="/uplifted-nwu-student-support-ecosystem"
+    >
+      {/* your routes */}
+    </Stack>
+  );
+
 }
