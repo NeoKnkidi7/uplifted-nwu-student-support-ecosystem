@@ -5,18 +5,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    
-    # Use Bun instead of npm
     - name: Setup Bun
       uses: oven-sh/setup-bun@v1
-      with:
-        bun-version: latest
-        
-    - run: bun install  # Replaces npm ci
-    - run: bun run build  # Replaces npm run build
+      with: { bun-version: 'latest' }
+    - run: bun install
     
+    # ADD EXPO CLI INSTALLATION HERE
+    - name: Install Expo CLI
+      run: bun add -g expo-cli
+      
+    - run: bun run build:web
     - uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./build
+        publish_dir: ./web-build
         destination_dir: uplifted-nwu-student-support-ecosystem
