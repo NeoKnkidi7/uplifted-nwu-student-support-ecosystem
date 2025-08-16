@@ -7,34 +7,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    
-    # Setup Bun
     - name: Setup Bun
       uses: oven-sh/setup-bun@v1
-      with:
-        bun-version: latest
-        
+      with: { bun-version: 'latest' }
     - uses: actions/setup-java@v3
       with: { java-version: '17' }
+    - run: bun install
     
-    - run: bun install  # Replaces npm ci
-    
+    # ADD EXPO CLI INSTALLATION HERE
+    - name: Install Expo CLI
+      run: bun add -g expo-cli
+      
     - name: Setup Android
       uses: android-actions/setup-android@v2
-      
+    - name: Restore Keystore
+      run: |
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > upload.keystore
     - name: Build APK
       run: bun run build:android
       env:
-        SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
-        SIGNING_PASS: ${{ secrets.SIGNING_PASS }}
-        
+        EXPO_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_PASS }}
+        EXPO_ANDROID_KEY_PASSWORD: ${{ secrets.SIGNING_PASS }}
     - name: Upload APK
       uses: actions/upload-artifact@v3
       with:
         name: app-release
-        path: android/app/build/outputs/apk/release/app-release.apk
-        
-    - name: Attach to Release
-      uses: softprops/action-gh-release@v1
+        path: android/app/build/outputs/apk/release/*.apk
+    - uses: softprops/action-gh-release@v1
       with:
-        files: android/app/build/outputs/apk/release/app-release.apk
+        files: android/app/build/outputs/apk/release/*.apk
