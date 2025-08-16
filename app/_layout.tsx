@@ -7,46 +7,19 @@ import { AuthProvider } from "@/hooks/auth-store";
 import { DeadlinesProvider } from "@/hooks/deadlines-store";
 import { AIAssistantProvider } from "@/hooks/ai-assistant-store";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
-
 const queryClient = new QueryClient();
 
-// Expo Router configuration for GitHub Pages subpath
 export const unstable_settings = {
-  baseUrl: '/uplifted-nwu-student-support-ecosystem/',
+  baseUrl: '/UpliftED-NWU-Student-Support-Ecosystem/',
 };
-
-function RootLayoutNav() {
-  return (
-    <Stack
-      screenOptions={{ headerShown: false }}
-      // Critical for GitHub Pages deployment:
-      basename="/uplifted-nwu-student-support-ecosystem"
-    >
-      <Stack.Screen name="(auth)" />
-      <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="profile" />
-      <Stack.Screen name="notifications" />
-      <Stack.Screen name="bursary/[id]" />
-      <Stack.Screen name="resource/[id]" />
-      <Stack.Screen name="mental-health/[id]" />
-      <Stack.Screen name="career/[id]" />
-      <Stack.Screen name="resource-exchange" />
-      <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-    </Stack>
-  );
-}
 
 export default function RootLayout() {
   useEffect(() => {
     const hideSplash = async () => {
       await SplashScreen.hideAsync();
     };
-    
-    // Add timeout to ensure assets are loaded
-    const timeout = setTimeout(hideSplash, 500);
-    return () => clearTimeout(timeout);
+    setTimeout(hideSplash, 500);
   }, []);
 
   return (
@@ -55,7 +28,21 @@ export default function RootLayout() {
         <AuthProvider>
           <DeadlinesProvider>
             <AIAssistantProvider>
-              <RootLayoutNav />
+              <Stack
+                screenOptions={{ headerShown: false }}
+                basename="/UpliftED-NWU-Student-Support-Ecosystem"
+              >
+                <Stack.Screen name="(auth)" />
+                <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="profile" />
+                <Stack.Screen name="notifications" />
+                <Stack.Screen name="bursary/[id]" />
+                <Stack.Screen name="resource/[id]" />
+                <Stack.Screen name="mental-health/[id]" />
+                <Stack.Screen name="career/[id]" />
+                <Stack.Screen name="resource-exchange" />
+                <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+              </Stack>
             </AIAssistantProvider>
           </DeadlinesProvider>
         </AuthProvider>
