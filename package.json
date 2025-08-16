@@ -1,6 +1,7 @@
+
 {
   "scripts": {
-    "build:web": "expo build:web",
-    "build:android": "expo build:android"
+    "web": "expo start --web",
+    "android": "expo run:android"
   }
 }
