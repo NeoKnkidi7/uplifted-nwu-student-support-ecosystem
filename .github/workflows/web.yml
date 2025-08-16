@@ -11,13 +11,14 @@ jobs:
     - run: bun install
     - name: Install Expo CLI
       run: bun add -g expo-cli
-    # Set base URL for GitHub Pages
-    - run: expo config --type web set web.baseUrl /uplifted-nwu-student-support-ecosystem/
-    - run: bun run build:web
-    - name: Add .nojekyll file
-      run: touch web-build/.nojekyll
+    - run: |
+        expo config set web.baseUrl /UpliftED-NWU-Student-Support-Ecosystem/
+        bun run build:web
+    - name: Prepare Deployment
+      run: |
+        touch web-build/.nojekyll
+        echo 'neoknkidi7.github.io/UpliftED-NWU-Student-Support-Ecosystem' > web-build/CNAME
     - uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./web-build
-        # No destination_dir needed
