@@ -1,3 +1,6 @@
 {
-  "homepage": "/uplifted-nwu-student-support-ecosystem"
+  "scripts": {
+    "build": "react-scripts build",
+    "build:android": "cd android && ./gradlew assembleRelease"
+  }
 }
