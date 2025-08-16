@@ -10,29 +10,26 @@ jobs:
     - name: Setup Bun
       uses: oven-sh/setup-bun@v1
       with: { bun-version: 'latest' }
-    - uses: actions/setup-java@v3
-      with: { java-version: '17' }
     - run: bun install
-    
-    # ADD EXPO CLI INSTALLATION HERE
     - name: Install Expo CLI
       run: bun add -g expo-cli
-      
-    - name: Setup Android
-      uses: android-actions/setup-android@v2
+    - name: Prebuild Android
+      run: expo prebuild --platform android
     - name: Restore Keystore
       run: |
-        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > upload.keystore
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/upload.keystore
     - name: Build APK
-      run: bun run build:android
+      working-directory: android
+      run: ./gradlew assembleRelease
       env:
-        EXPO_ANDROID_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_PASS }}
-        EXPO_ANDROID_KEY_PASSWORD: ${{ secrets.SIGNING_PASS }}
+        ORG_GRADLE_PROJECT_android_storePassword: ${{ secrets.SIGNING_PASS }}
+        ORG_GRADLE_PROJECT_android_keyPassword: ${{ secrets.SIGNING_PASS }}
+        ORG_GRADLE_PROJECT_android_keyAlias: upload
     - name: Upload APK
       uses: actions/upload-artifact@v3
       with:
         name: app-release
-        path: android/app/build/outputs/apk/release/*.apk
+        path: android/app/build/outputs/apk/release/app-release.apk
     - uses: softprops/action-gh-release@v1
       with:
-        files: android/app/build/outputs/apk/release/*.apk
+        files: android/app/build/outputs/apk/release/app-release.apk
