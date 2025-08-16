@@ -9,14 +9,15 @@ jobs:
       uses: oven-sh/setup-bun@v1
       with: { bun-version: 'latest' }
     - run: bun install
-    
-    # ADD EXPO CLI INSTALLATION HERE
     - name: Install Expo CLI
       run: bun add -g expo-cli
-      
+    # Set base URL for GitHub Pages
+    - run: expo config --type web set web.baseUrl /uplifted-nwu-student-support-ecosystem/
     - run: bun run build:web
+    - name: Add .nojekyll file
+      run: touch web-build/.nojekyll
     - uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./web-build
-        destination_dir: uplifted-nwu-student-support-ecosystem
+        # No destination_dir needed
