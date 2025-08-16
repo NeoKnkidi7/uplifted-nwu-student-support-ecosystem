@@ -1,20 +1,23 @@
 name: Build Android
 on: 
-  release:
-    types: [created]
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with: { java-version: '17' }
     - name: Setup Bun
       uses: oven-sh/setup-bun@v1
       with: { bun-version: 'latest' }
     - run: bun install
     - name: Install Expo CLI
       run: bun add -g expo-cli
-    - name: Prebuild Android
-      run: expo prebuild --platform android
+    - run: expo prebuild --platform android
     - name: Restore Keystore
       run: |
         echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/upload.keystore
@@ -22,14 +25,14 @@ jobs:
       working-directory: android
       run: ./gradlew assembleRelease
       env:
+        ORG_GRADLE_PROJECT_android_storeFile: upload.keystore
         ORG_GRADLE_PROJECT_android_storePassword: ${{ secrets.SIGNING_PASS }}
-        ORG_GRADLE_PROJECT_android_keyPassword: ${{ secrets.SIGNING_PASS }}
         ORG_GRADLE_PROJECT_android_keyAlias: upload
-    - name: Upload APK
-      uses: actions/upload-artifact@v3
+        ORG_GRADLE_PROJECT_android_keyPassword: ${{ secrets.SIGNING_PASS }}
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
       with:
-        name: app-release
-        path: android/app/build/outputs/apk/release/app-release.apk
-    - uses: softprops/action-gh-release@v1
-      with:
-        files: android/app/build/outputs/apk/release/app-release.apk
+        files: android/app/build/outputs/apk/release/*.apk
+        tag_name: ${{ github.ref }}
+        name: Release ${{ github.ref }}
+        generate_release_notes: true
