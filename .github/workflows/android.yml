@@ -1,64 +1,45 @@
-name: Build Android
-on: 
-  release:
-    types: [created]
+name: Deploy Web
+on: [push]
 jobs:
-  build:
+  build-deploy:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     
-    # 1. Set up Java environment
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
+    # 1. Use Node.js 16 (compatible with Expo)
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
       with:
-        java-version: '17'
-        distribution: 'temurin'
-    
-    # 2. Set up Android environment
-    - name: Set up Android SDK
-      uses: android-actions/setup-android@v2
-      
-    - name: Setup Bun
-      uses: oven-sh/setup-bun@v1
-      with: { bun-version: 'latest' }
-    
+        node-version: '16'  # Node 16 works with legacy expo-cli
+        
+    # 2. Install Bun
+    - name: Install Bun
+      run: |
+        npm install -g bun
+        bun -v
+        
     # 3. Install dependencies
-    - run: bun install
-    - name: Install Expo CLI
-      run: bun add -g expo-cli
-    
-    # 4. Accept Android licenses
-    - name: Accept Android licenses
+    - name: Install dependencies
       run: |
-        yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
+        bun install
+        npm install -g expo-cli@legacy  # Install legacy CLI explicitly
         
-    # 5. Prebuild Android project
-    - name: Prebuild Android
-      run: expo prebuild --platform android
-    
-    # 6. Restore signing keystore
-    - name: Restore Keystore
+    # 4. Build web app directly (no baseUrl config needed)
+    - name: Build web app
       run: |
-        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/upload.keystore
-    
-    # 7. Build Android APK
-    - name: Build APK
-      working-directory: android
-      run: ./gradlew assembleRelease
-      env:
-        ORG_GRADLE_PROJECT_android_storeFile: upload.keystore
-        ORG_GRADLE_PROJECT_android_storePassword: ${{ secrets.SIGNING_PASS }}
-        ORG_GRADLE_PROJECT_android_keyPassword: ${{ secrets.SIGNING_PASS }}
-        ORG_GRADLE_PROJECT_android_keyAlias: upload
-    
-    # 8. Upload and attach to release
-    - name: Upload APK
-      uses: actions/upload-artifact@v3
-      with:
-        name: app-release
-        path: android/app/build/outputs/apk/release/*.apk
+        # Set base URL in app.json instead
+        echo '{"expo": {"web": {"build": {"baseUrl": "/UpliftED-NWU-Student-Support-Ecosystem/"}}}}' > app.json
+        expo build:web
         
-    - uses: softprops/action-gh-release@v1
+    # 5. Verify build output
+    - name: Verify build
+      run: |
+        ls -la web-build
+        echo "Base URL set to: $(grep baseUrl app.json)"
+        
+    # 6. Deploy to GitHub Pages
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
       with:
-        files: android/app/build/outputs/apk/release/*.apk
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./web-build
