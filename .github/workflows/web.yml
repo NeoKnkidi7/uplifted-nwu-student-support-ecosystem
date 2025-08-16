@@ -1,20 +1,22 @@
 name: Deploy Web
-on: 
-  push:
-    branches: [main]
+on: [push]
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/setup-node@v3
-      with: { node-version: 18 }
-    - run: npm ci
-    - run: npm run build
+    
+    # Use Bun instead of npm
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: latest
+        
+    - run: bun install  # Replaces npm ci
+    - run: bun run build  # Replaces npm run build
+    
     - uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./build
-        # Add these lines for client-side routing:
-        enable_jekyll: true
-        cname: neoknkidi7.github.io/uplifted-nwu-student-support-ecosystem
+        destination_dir: uplifted-nwu-student-support-ecosystem
