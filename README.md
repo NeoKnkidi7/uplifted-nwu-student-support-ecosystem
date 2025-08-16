@@ -47,3 +47,13 @@ git push origin main
 ## Troubleshooting
 - Web 404 error: Wait 5 minutes after deployment
 - Android build fails: Check workflow logs in Actions tab
+
+## Running Locally
+
+### Web Development
+```bash
+bun run web
+
+git add .
+git commit -m "Fix deployment: GitHub Pages 404 and Android build"
+git push origin main
