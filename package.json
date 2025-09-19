@@ -1,10 +1,12 @@
-"scripts": {
-  "build": "expo export --platform web",
-  "build:web": "expo export --platform web"
-}
-"scripts": {
-  "build": "react-scripts build"
-}
-"scripts": {
-  "build": "vite build"
+{
+  "scripts": {
+    // Remove TypeScript-specific scripts if any
+    "build": "expo export --platform web"
+  },
+  "dependencies": {
+    // Remove TypeScript and type definitions
+  },
+  "devDependencies": {
+    // Remove TypeScript compiler and related packages
+  }
 }
