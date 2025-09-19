@@ -1,66 +1,26 @@
-name: Build Android
-on: 
-  release:
-    types: [created]
+name: Android Build
+on:
+  push:
+    tags: ['v*'] # Trigger on version tags
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    
-    # 1. Set up Java environment
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-    
-    # 2. Set up Android environment
-    - name: Set up Android SDK
-      uses: android-actions/setup-android@v2
-      
-    - name: Setup Bun
-      uses: oven-sh/setup-bun@v1
-      with: { bun-version: 'latest' }
-    
-    # 3. Install dependencies
-    - run: bun install
-    - name: Install Expo CLI
-      run: bun add -g expo-cli
-    
-    # 4. Accept Android licenses
-    - name: Accept Android licenses
-      run: |
-        yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses
-        
-    # 5. Prebuild Android project
-    - name: Prebuild Android
-      run: expo prebuild --platform android
-    
-    # 6. Restore signing keystore
-    - name: Restore Keystore
-      run: |
-        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/upload.keystore
-    
-    # 7. Build Android APK
-    - name: Build APK
-      working-directory: android
-      run: ./gradlew assembleRelease
-      env:
-        ORG_GRADLE_PROJECT_android_storeFile: upload.keystore
-        ORG_GRADLE_PROJECT_android_storePassword: ${{ secrets.SIGNING_PASS }}
-        ORG_GRADLE_PROJECT_android_keyPassword: ${{ secrets.SIGNING_PASS }}
-        ORG_GRADLE_PROJECT_android_keyAlias: upload
-    
-    # 8. Upload and attach to release (FIXED VERSION)
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-release
-        path: |
-          android/app/build/outputs/apk/release/*.apk
-          !android/app/build/outputs/apk/release/*.apk.idsig
-        
-    - uses: softprops/action-gh-release@v1
-      with:
-        files: android/app/build/outputs/apk/release/*.apk
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+      - uses: android-actions/setup-android@v2
+      - name: Generate local.properties
+        run: echo "sdk.dir=$ANDROID_HOME" > ./android/local.properties
+      - name: Build APK
+        run: |
+          cd android
+          ./gradlew assembleDebug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
